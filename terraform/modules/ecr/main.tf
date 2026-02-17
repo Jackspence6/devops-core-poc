@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "finance_tracker_repository" {
   # Creates a repo in AWS ECR to store our Docker images for deployment to ECS
-  name                 = var.repository_name
+  name                 = var.ecr_repository_name
   image_tag_mutability = "MUTABLE"
 }
 
