@@ -13,3 +13,9 @@ module "ecs" {
   subnet_ids     = module.vpc.public_subnets
 }
 
+# IAM
+module "iam" {
+  source      = "../../modules/iam"
+  github_repo = var.github_repo
+  role_name   = var.role_name
+}
