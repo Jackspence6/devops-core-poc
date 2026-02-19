@@ -1,12 +1,31 @@
+![WIP](https://img.shields.io/badge/status-WIP-orange)
+
 # DevOps Core Proof of Concept
 
 End-to-end DevOps proof of concept showcasing AWS infrastructure provisioning, CI/CD pipelines, containerized application deployment, and managed database integration.
 
 ---
 
-## 🛠 AWS IAM Roles
+## 📑 Table of Contents
 
-This project uses two main IAM roles for managing access:
+1. [IAM (Identity and Access Management)](#%F0%9F%A7%91%F0%9F%91%BB-iam-identity-and-access-management)
+   - [Dev Role (`dev-ops-ninja`)](#1-dev-role-dev-ops-ninja)
+   - [GitHub Actions Role (`github-actions-role`)](#2-github-actions-role-github-actions-role)
+2. [Local Development](#%F0%9F%A7%91%F0%9F%91%BB-local-development)
+3. [ECR (Elastic Container Registry)](#%F0%9F%90%B3-ecr-elastic-container-registry)
+4. [ECS (Elastic Container Service)](#%F0%9F%9F%A2-ecs-elastic-container-service)
+5. [RDS (PostgreSQL Database)](#%F0%9F%97%84%EF%B8%8F-rds-postgresql-database)
+6. [VPC (Virtual Private Cloud)](#%F0%9F%8C%90-vpc-virtual-private-cloud)
+
+---
+
+## 🧑‍💻 IAM (Identity and Access Management)
+
+**Purpose:** Manage users, roles, and permissions for accessing AWS resources.
+
+- **Roles Available:**
+  - **Dev Role (`dev-ops-ninja`)** - For local development and Terraform infrastructure provisioning. Full admin permissions.
+  - **GitHub Actions Role (`github-actions-role`)** - For CI/CD pipeline access via OIDC.
 
 ### 1. **Dev Role** (`dev-ops-ninja`)
 
@@ -81,3 +100,91 @@ Navigate to the `terraform/environments/dev` directory and run `terraform init` 
 4. **Plan and Apply**:
 
 Use `terraform plan` to see the changes that will be made, and `terraform apply` to provision the infrastructure.
+
+## 🐳 ECR (Elastic Container Registry)
+
+**Purpose:** Host Docker container images for ECS deployments.
+
+### How to Use:
+
+```bash
+# Authenticate Docker to ECR
+aws ecr get-login-password --region <AWS_REGION> | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com
+
+# Build image
+docker build -t my-app .
+
+# Tag image
+docker tag my-app:latest <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/my-app:latest
+
+# Push image
+docker push <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/my-app:latest
+```
+
+## 🟢 ECS (Elastic Container Service)
+
+**Purpose:** Run containerized applications using Docker images from ECR.
+
+- **Cluster:** `dev-ops-cluster`
+- **Service:** `dev-ops-service`
+- **Task Definition:** `dev-ops-task`
+- **Deployment Steps:**
+  1. Update Docker image in ECR
+  2. Update ECS task definition with new image
+  3. Deploy via Terraform or ECS console
+- **Quick Commands:**
+
+  ```bash
+    # Check running tasks
+    aws ecs list-tasks --cluster devops-core-poc-cluster
+
+    # Describe task
+    aws ecs describe-tasks --cluster devops-core-poc-cluster --tasks <task-id>
+
+  ```
+
+## 🗄️ RDS (PostgreSQL Database)
+
+**Purpose:** Managed relational database for application storage.
+
+- **Instance Name:** `dev-ops-db`
+- **Database Engine:** PostgreSQL
+- **Connection Info:**
+  - Host: `<RDS_ENDPOINT>`
+  - Port: `5432`
+  - Username: `admin`
+  - Password: `yourpassword`
+
+- **Terraform Example Outputs:**
+
+  ```hcl
+  terraform output db_endpoint
+  terraform output db_port
+  ```
+
+- **Connecting via psql:**
+
+  ```bash
+  psql -h <RDS_ENDPOINT> -p 5432 -U admin -d postgres
+  ```
+
+## 🌐 VPC (Virtual Private Cloud)
+
+**Purpose:** Network layer for all AWS resources - subnets, routing, internet access.
+
+- **Components:**
+  - **Public Subnets:** For ALB or NAT
+  - **Private Subnets:** For ECS tasks and RDS
+  - **Internet Gateway:** Provides outbound access for public subnets
+  - **Route Tables:** Manage traffic within VPC
+
+- **Terraform Outputs:**
+
+  ```hcl
+    terraform output vpc_id
+    terraform output public_subnets
+    terraform output private_subnets
+  ```
+
+- **Notes:**
+  - All other modules (ECS, RDS) are deployed into this VPC.
