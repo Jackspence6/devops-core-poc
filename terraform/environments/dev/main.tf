@@ -33,20 +33,28 @@ module "vpc" {
 }
 
 # RDS
-# module "rds" {
-#   source              = "../../modules/rds"
-#   name                = var.db_name_prefix
-#   db_identifier       = var.db_identifier
-#   allocated_storage   = var.db_allocated_storage
-#   engine_version      = var.db_engine_version
-#   instance_class      = var.db_instance_class
-#   db_name             = var.db_name
-#   db_username         = var.db_username
-#   db_password         = var.db_password
-#   subnet_ids          = module.vpc.private_subnets
-#   vpc_id              = module.vpc.vpc_id
-#   ecs_security_groups = var.ecs_security_groups
-#   multi_az            = var.db_multi_az
-#   backup_retention    = var.db_backup_retention
-#   tags                = var.common_tags
-# }
+module "rds" {
+  source              = "../../modules/rds"
+  name                = var.db_name_prefix
+  db_identifier       = var.db_identifier
+  allocated_storage   = var.db_allocated_storage
+  engine_version      = var.db_engine_version
+  instance_class      = var.db_instance_class
+  db_name             = var.db_name
+  db_username         = var.db_username
+  db_password         = var.db_password
+  subnet_ids          = module.vpc.private_subnets
+  vpc_id              = module.vpc.vpc_id
+  ecs_security_groups = var.ecs_security_groups
+  multi_az            = var.db_multi_az
+  backup_retention    = var.db_backup_retention
+  tags                = var.common_tags
+}
+
+output "db_endpoint" {
+  value = module.rds.db_endpoint
+}
+
+output "db_port" {
+  value = module.rds.db_port
+}

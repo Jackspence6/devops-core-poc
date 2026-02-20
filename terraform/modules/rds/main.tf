@@ -14,7 +14,7 @@ resource "aws_security_group" "this" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # restrict for production!
+    cidr_blocks = ["0.0.0.0/0"] # TODO: Restrict for prod
   }
 
   egress {
@@ -35,7 +35,7 @@ resource "aws_db_instance" "this" {
   username                = var.db_username
   password                = var.db_password
   db_subnet_group_name    = aws_db_subnet_group.this.name
-  vpc_security_group_ids  = [aws_security_group.this.id] + var.ecs_security_groups
+  vpc_security_group_ids  = concat([aws_security_group.this.id], var.ecs_security_groups)
   multi_az                = var.multi_az
   backup_retention_period = var.backup_retention
   skip_final_snapshot     = true
