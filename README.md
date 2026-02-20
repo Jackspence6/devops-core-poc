@@ -27,6 +27,13 @@ End-to-end DevOps proof of concept showcasing AWS infrastructure provisioning, C
   - **Dev Role (`dev-ops-ninja`)** - For local development and Terraform infrastructure provisioning. Full admin permissions.
   - **GitHub Actions Role (`github-actions-role`)** - For CI/CD pipeline access via OIDC.
 
+### IAM Configuration Table
+
+| Role Name               | Purpose                            | Permissions         | Session Expiration | Notes                                 |
+| ----------------------- | ---------------------------------- | ------------------- | ------------------ | ------------------------------------- |
+| **dev-ops-ninja**       | Local dev + Terraform provisioning | AdministratorAccess | 1 hour             | Assume via AWS CLI, sets local creds  |
+| **github-actions-role** | CI/CD pipelines via GitHub Actions | AdministratorAccess | 1 hour             | Trusts GitHub OIDC; used in workflows |
+
 ### 1. **Dev Role** (`dev-ops-ninja`)
 
 - **Purpose:** For local development and Terraform infrastructure provisioning.
@@ -170,21 +177,42 @@ docker push <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/my-app:latest
 
 ## 🌐 VPC (Virtual Private Cloud)
 
-**Purpose:** Network layer for all AWS resources - subnets, routing, internet access.
+**Purpose:** Network layer for all AWS resources — subnets, routing, internet access, and security boundaries.
 
 - **Components:**
-  - **Public Subnets:** For ALB or NAT
-  - **Private Subnets:** For ECS tasks and RDS
-  - **Internet Gateway:** Provides outbound access for public subnets
-  - **Route Tables:** Manage traffic within VPC
+  - **Public Subnets:** For internet-facing resources like ALB or NAT Gateway.
+  - **Private Subnets:** For ECS tasks, RDS, and other internal services.
+  - **Internet Gateway (IGW):** Provides outbound internet access for public subnets.
+  - **Route Tables:** Manage traffic flow within the VPC.
 
 - **Terraform Outputs:**
 
   ```hcl
-    terraform output vpc_id
-    terraform output public_subnets
-    terraform output private_subnets
+  terraform output vpc_id           # ID of the VPC
+  terraform output public_subnets  # List of public subnet IDs
+  terraform output private_subnets # List of private subnet IDs
   ```
 
-- **Notes:**
-  - All other modules (ECS, RDS) are deployed into this VPC.
+### 🌐 VPC Configuration
+
+| Component              | Value / Description                            |
+| ---------------------- | ---------------------------------------------- |
+| **VPC ID**             | `terraform output vpc_id`                      |
+| **CIDR Block**         | `10.0.0.0/16`                                  |
+| **Public Subnets**     | `10.0.1.0/24`, `10.0.2.0/24`                   |
+| **Private Subnets**    | `10.0.101.0/24`, `10.0.102.0/24`               |
+| **Availability Zones** | `us-east-1a`, `us-east-1b`                     |
+| **Internet Gateway**   | Attached to VPC (for public subnet access)     |
+| **NAT Gateway**        | ❌ Not deployed                                |
+| **Route Tables**       | Public subnets → IGW                           |
+| **Tags**               | Project: `devops-core-poc`, Environment: `dev` |
+
+**Notes:**
+
+- Public subnets are mapped to receive public IPs automatically.
+- Private subnets currently have **no outbound internet** to stay within free-tier limits.
+- NAT Gateway can be added later if private subnets need internet access.
+
+**Additional Notes:**
+
+- All other modules (ECS, RDS) are deployed into this VPC.
