@@ -110,7 +110,7 @@ variable "ecs_security_groups" {
 
 variable "db_multi_az" {
   description = "Enable multi-AZ deployment"
-  type        = boolean
+  type        = bool
 }
 
 variable "db_backup_retention" {

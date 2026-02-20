@@ -23,14 +23,14 @@ module "iam" {
 }
 
 # VPC
-# module "vpc" {
-#   source                = "../../modules/vpc"
-#   cidr_block            = var.vpc_cidr_block
-#   public_subnets_cidrs  = var.vpc_public_subnets
-#   private_subnets_cidrs = var.vpc_private_subnets
-#   azs                   = var.vpc_azs
-#   tags                  = var.common_tags
-# }
+module "vpc" {
+  source                = "../../modules/vpc"
+  cidr_block            = var.vpc_cidr_block
+  public_subnets_cidrs  = var.vpc_public_subnets
+  private_subnets_cidrs = var.vpc_private_subnets
+  azs                   = var.vpc_azs
+  tags                  = var.common_tags
+}
 
 # RDS
 # module "rds" {
