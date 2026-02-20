@@ -39,3 +39,87 @@ variable "dev_role_name" {
   type        = string
   default     = "dev-ops-ninja"
 }
+
+# VPC
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "vpc_public_subnets" {
+  description = "Public subnet CIDRs"
+  type        = list(string)
+}
+
+variable "vpc_private_subnets" {
+  description = "Private subnet CIDRs"
+  type        = list(string)
+}
+
+variable "vpc_azs" {
+  description = "Availability zones"
+  type        = list(string)
+}
+
+# RDS VARIABLES
+variable "db_name_prefix" {
+  description = "Name prefix for RDS resources"
+  type        = string
+}
+
+variable "db_identifier" {
+  description = "RDS instance identifier"
+  type        = string
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage (GB)"
+  type        = number
+}
+
+variable "db_engine_version" {
+  description = "Postgres engine version"
+  type        = string
+}
+
+variable "db_instance_class" {
+  description = "RDS instance size"
+  type        = string
+}
+
+variable "db_name" {
+  description = "Initial database name"
+  type        = string
+}
+
+variable "db_username" {
+  description = "Database username"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "ecs_security_groups" {
+  description = "Security groups allowed to access RDS"
+  type        = list(string)
+}
+
+variable "db_multi_az" {
+  description = "Enable multi-AZ deployment"
+  type        = boolean
+}
+
+variable "db_backup_retention" {
+  description = "Backup retention period (days)"
+  type        = number
+}
+
+# COMMON TAGS
+variable "common_tags" {
+  description = "Common resource tags"
+  type        = map(string)
+}
