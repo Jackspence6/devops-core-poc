@@ -116,17 +116,23 @@ Use `terraform plan` to see the changes that will be made, and `terraform apply`
 
 ```bash
 # Authenticate Docker to ECR
-aws ecr get-login-password --region <AWS_REGION> | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 471112820262.dkr.ecr.us-east-1.amazonaws.com
 
 # Build image
-docker build -t my-app .
+docker build -t <APP_NAME> .
 
 # Tag image
-docker tag my-app:latest <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/my-app:latest
+docker tag <APP_NAME>:latest <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<APP_NAME>:latest
 
 # Push image
 docker push <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/my-app:latest
 ```
+
+#### Finance Tracker ECR Details
+
+**Repository URL:** 471112820262.dkr.ecr.us-east-1.amazonaws.com/finance-tracker-repository
+
+**Repository ARN:** arn:aws:ecr:us-east-1:471112820262:repository/finance-tracker-repository
 
 ## 🟢 ECS (Elastic Container Service)
 
