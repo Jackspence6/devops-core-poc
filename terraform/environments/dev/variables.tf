@@ -5,10 +5,10 @@ variable "aws_region" {
 }
 
 # ECR
-# variable "ecr_repository_name" {
-#   description = "ECR repository name for dev environment"
-#   type        = string
-# }
+variable "ecr_repository_name" {
+  description = "ECR repository name for dev environment"
+  type        = string
+}
 
 # ECS
 # variable "ecs_cluster_name" {

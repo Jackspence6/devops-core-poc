@@ -1,8 +1,8 @@
 # ECR
-# module "ecr" {
-#   source              = "../../modules/ecr"
-#   ecr_repository_name = var.ecr_repository_name
-# }
+module "ecr" {
+  source              = "../../modules/ecr"
+  ecr_repository_name = var.ecr_repository_name
+}
 
 # ECS
 # module "ecs" {
@@ -49,12 +49,4 @@ module "rds" {
   multi_az            = var.db_multi_az
   backup_retention    = var.db_backup_retention
   tags                = var.common_tags
-}
-
-output "db_endpoint" {
-  value = module.rds.db_endpoint
-}
-
-output "db_port" {
-  value = module.rds.db_port
 }
