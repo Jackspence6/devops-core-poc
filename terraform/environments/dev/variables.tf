@@ -11,10 +11,10 @@ variable "ecr_repository_name" {
 }
 
 # ECS
-# variable "ecs_cluster_name" {
-#   description = "The name of the ECS cluster for dev environment"
-#   type        = string
-# }
+variable "ecs_cluster_name" {
+  description = "The name of the ECS cluster for dev environment"
+  type        = string
+}
 
 # IAM
 variable "github_repo" {
@@ -122,4 +122,11 @@ variable "db_backup_retention" {
 variable "common_tags" {
   description = "Common resource tags"
   type        = map(string)
+}
+
+# ALB
+variable "container_port" {
+  description = "Container port for the ALB target group"
+  type        = number
+  default     = 3000
 }
