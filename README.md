@@ -1,6 +1,6 @@
-![WIP](https://img.shields.io/badge/status-WIP-orange)
-
 # DevOps Core Proof of Concept
+
+🚀 Live Application: http://finance-tracker-alb-2036972499.us-east-1.elb.amazonaws.com
 
 End-to-end DevOps proof of concept showcasing AWS infrastructure provisioning, CI/CD pipelines, containerized application deployment, and managed database integration.
 
@@ -9,11 +9,9 @@ End-to-end DevOps proof of concept showcasing AWS infrastructure provisioning, C
 ## 📑 Table of Contents
 
 1. [IAM (Identity and Access Management)](#%F0%9F%A7%91%F0%9F%91%BB-iam-identity-and-access-management)
-   - [Dev Role (`dev-ops-ninja`)](#1-dev-role-dev-ops-ninja)
-   - [GitHub Actions Role (`github-actions-role`)](#2-github-actions-role-github-actions-role)
-2. [Local Development](#%F0%9F%A7%91%F0%9F%91%BB-local-development)
-3. [ECR (Elastic Container Registry)](#%F0%9F%90%B3-ecr-elastic-container-registry)
-4. [ECS (Elastic Container Service)](#%F0%9F%9F%A2-ecs-elastic-container-service)
+2. [ECR (Elastic Container Registry)](#%F0%9F%90%B3-ecr-elastic-container-registry)
+3. [ECS (Elastic Container Service)](#%F0%9F%9F%A2-ecs-elastic-container-service)
+4. [ALB (Application Load Balancer)](#%F0%9F%8C%90-alb-application-load-balancer)
 5. [RDS (PostgreSQL Database)](#%F0%9F%97%84%EF%B8%8F-rds-postgresql-database)
 6. [VPC (Virtual Private Cloud)](#%F0%9F%8C%90-vpc-virtual-private-cloud)
 
@@ -136,25 +134,54 @@ docker push <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/my-app:latest
 
 ## 🟢 ECS (Elastic Container Service)
 
-**Purpose:** Run containerized applications using Docker images from ECR.
+**Purpose:** Run containerized Next.js app using Fargate.
 
-- **Cluster:** `dev-ops-cluster`
-- **Service:** `dev-ops-service`
-- **Task Definition:** `dev-ops-task`
-- **Deployment Steps:**
-  1. Update Docker image in ECR
-  2. Update ECS task definition with new image
-  3. Deploy via Terraform or ECS console
-- **Quick Commands:**
+### Configuration
 
-  ```bash
-    # Check running tasks
-    aws ecs list-tasks --cluster devops-core-poc-cluster
+- **Launch Type:** Fargate
+- **Cluster:** `finance-tracker-cluster`
+- **Service:** `finance-tracker-cluster`
+- **Container Port:** `3000`
+- **CPU / Memory:** `0.25 vCPU / 0.5GB`
 
-    # Describe task
-    aws ecs describe-tasks --cluster devops-core-poc-cluster --tasks <task-id>
+### Key Notes
 
-  ```
+- App runs on **port 3000** (Next.js default)
+- Security group allows traffic from ALB → ECS on port 3000
+- Uses ECR image: `471112820262.dkr.ecr.us-east-1.amazonaws.com/finance-tracker-repository:latest`
+
+### Deployment Flow
+
+1. Push image to ECR
+2. Terraform updates task definition
+3. ECS service redeploys tasks
+4. ALB routes traffic to healthy containers
+
+---
+
+## 🌐 ALB (Application Load Balancer)
+
+**Purpose:** Expose ECS service to the internet.
+
+### Configuration
+
+- **Type:** Internet-facing
+- **Listener Port:** `80`
+- **Target Group Port:** `3000`
+- **Health Check Path:** `/`
+- **Health Check Port:** `traffic-port`
+
+### Traffic Flow
+
+User → ALB (port 80) → Target Group → ECS Task (port 3000)
+
+### Important Notes
+
+- 503 errors usually mean:
+  - App not running
+  - Wrong port
+  - Health checks failing
+- Target group port **must match** container port
 
 ## 🗄️ RDS (PostgreSQL Database)
 
