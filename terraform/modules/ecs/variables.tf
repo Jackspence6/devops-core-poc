@@ -18,3 +18,19 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
+variable "target_group_arn" {
+  type = string
+}
+
+variable "listener_arn" {
+  type = string
+}
+
+variable "security_group_ids" {
+  type = list(string)
+}
+
+variable "execution_role_arn" {
+  description = "ECS Task Execution Role ARN"
+  type        = string
+}
