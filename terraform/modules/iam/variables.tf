@@ -21,3 +21,10 @@ variable "dev_user_arn" {
   description = "Your IAM user ARN"
   type        = string
 }
+
+# ECS Task Execution Role
+variable "ecs_task_execution_role_name" {
+  description = "Name of ECS task execution role"
+  type        = string
+  default     = "ecsTaskExecutionRole"
+}
